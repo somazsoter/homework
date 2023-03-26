@@ -5,7 +5,7 @@ class ArticleRoutes < Sinatra::Base
 
   def initialize
     super
-    @articleCtrl = ArticleController.new
+    @article_ctrl = ArticleController.new
   end
 
   before do
@@ -13,47 +13,39 @@ class ArticleRoutes < Sinatra::Base
   end
 
   get('/') do
-    summmary = @articleCtrl.get_batch
+    summary = @article_ctrl.get_batch
+    return { msg: 'Could not get articles.' }.to_json unless summary[:ok]
 
-    if !(summary[:ok])
-      { articles: summary[:data] }.to_json
-    else
-      { msg: 'Could not get articles.' }.to_json
-    end
+    { articles: summary[:data] }.to_json
   end
 
   get('/:id') do
-    
+    summary = @article_ctrl.get_article(params[:id])
+    return { msg: 'Could not get article.' }.to_json unless summary[:ok]
+
+    { article: summary[:data] }.to_json
   end
 
   post('/') do
     payload = JSON.parse(request.body.read)
-    summary = @articleCtrl.update_article(payload)
+    summary = @article_ctrl.create_article(payload)
+    return { msg: summary[:msg] }.to_json unless summary[:ok]
 
-    if summary[:ok]
-      { msg: 'Article updated' }.to_json
-    else
-      { msg: summary[:msg] }.to_json
-    end
+    { msg: 'Article created' }.to_json
   end
 
   put('/:id') do
     payload = JSON.parse(request.body.read)
-    summary = @articleCtrl.uptade_article params['ids'], payload
+    summary = @article_ctrl.update_article(params[:id], payload)
+    return { msg: 'Could not update article.' }.to_json unless summary[:ok]
 
-    if summary[:ok]
-    else
-      { msg: summary[:msg] }.to_json
-    end
+    { msg: summary[:msg] }.to_json
   end
 
   delete('/:id') do
-    summary = self.delete_article params['id']
+    summary = @article_ctrl.delete_article(params[:id])
+    return { msg: 'Article does not exist' }.to_json unless summary[:ok]
 
-    if summary[:ok]
-      { msg: 'Article deleted' }.to_json
-    else
-      { mgs: 'Article does not exist' }.to_bson
-    end
+    { msg: summary[:msg] }.to_json
   end
 end

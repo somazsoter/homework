@@ -5,4 +5,5 @@ require_relative '../middleware/auth'
 
 require_relative 'health'
 require_relative 'articles'
+require_relative 'comments'
 require_relative 'home'
