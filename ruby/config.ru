@@ -18,3 +18,7 @@ end
 map '/articles' do
   run ArticleRoutes.new
 end
+
+map '/comments' do
+  run CommentRoutes.new
+end
